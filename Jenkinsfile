@@ -9,21 +9,21 @@ pipeline {
         }
         stage('Test') { 
             steps {
-                sh 'dotnet test --no-build --no-restore --collect "XPlat Code Coverage"' 
+                sh 'dotnet test --no-build --no-restore --collect "XPlat Code Coverage"'
             }
             post {
                 always {
-                    junit 'SimpleWebApi.Test/TestResults/**/*.xml' 
+                    recordCoverage(tools: [[parser: 'COBERTURA', pattern: '**/*.xml']], sourceDirectories: [[path: 'SimpleWebApi.Test/TestResults']])
                 }
             }
         }
         stage('Deliver') { 
             steps {
-                sh 'dotnet publish --no-build --no-restore -o published' 
+                sh 'dotnet publish SimpleWebApi --no-restore -o published' 
             }
             post {
                 success {
-                    archiveArtifacts 'published'
+                    archiveArtifacts 'published/*.*'
                 }
             }
         }
